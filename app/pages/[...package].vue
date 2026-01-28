@@ -797,88 +797,11 @@ defineOgImageComponent('Package', {
         :version="displayVersion.version"
       />
 
-      <!-- Binary-only packages: Show only execute command (no install) -->
-      <section v-if="isBinaryOnly" aria-labelledby="run-heading" class="mb-8">
+      <!-- Get started section: unified install/run commands -->
+      <section aria-labelledby="getstarted-heading" class="mb-8">
         <div class="flex flex-wrap items-center justify-between mb-3">
-          <h2 id="run-heading" class="text-xs text-fg-subtle uppercase tracking-wider">Run</h2>
-          <!-- Package manager tabs -->
-          <div
-            class="flex items-center gap-1 p-0.5 bg-bg-subtle border border-border rounded-md"
-            role="tablist"
-            aria-label="Package manager"
-          >
-            <ClientOnly>
-              <button
-                v-for="pm in packageManagers"
-                :key="pm.id"
-                role="tab"
-                :aria-selected="selectedPM === pm.id"
-                class="px-2 py-1 font-mono text-xs rounded transition-all duration-150"
-                :class="
-                  selectedPM === pm.id
-                    ? 'bg-bg-elevated text-fg'
-                    : 'text-fg-subtle hover:text-fg-muted'
-                "
-                @click="selectedPM = pm.id"
-              >
-                {{ pm.label }}
-              </button>
-              <template #fallback>
-                <span
-                  v-for="pm in packageManagers"
-                  :key="pm.id"
-                  class="px-2 py-1 font-mono text-xs rounded"
-                  :class="pm.id === 'npm' ? 'bg-bg-elevated text-fg' : 'text-fg-subtle'"
-                >
-                  {{ pm.label }}
-                </span>
-              </template>
-            </ClientOnly>
-          </div>
-        </div>
-        <div class="relative group">
-          <!-- Terminal-style execute command -->
-          <div class="bg-bg-subtle border border-border rounded-lg overflow-hidden">
-            <div class="flex gap-1.5 px-3 pt-2 sm:px-4 sm:pt-3">
-              <span class="w-2.5 h-2.5 rounded-full bg-fg-subtle" />
-              <span class="w-2.5 h-2.5 rounded-full bg-fg-subtle" />
-              <span class="w-2.5 h-2.5 rounded-full bg-fg-subtle" />
-            </div>
-            <div class="px-3 pt-2 pb-3 sm:px-4 sm:pt-3 sm:pb-4 space-y-1">
-              <!-- Execute command -->
-              <div class="flex items-center gap-2 group/executecmd">
-                <span class="text-fg-subtle font-mono text-sm select-none">$</span>
-                <code class="font-mono text-sm"
-                  ><ClientOnly
-                    ><span
-                      v-for="(part, i) in executeCommandParts"
-                      :key="i"
-                      :class="i === 0 ? 'text-fg' : 'text-fg-muted'"
-                      >{{ i > 0 ? ' ' : '' }}{{ part }}</span
-                    ><template #fallback
-                      ><span class="text-fg">npx</span
-                      ><span class="text-fg-muted"> {{ pkg.name }}</span></template
-                    ></ClientOnly
-                  ></code
-                >
-                <button
-                  type="button"
-                  class="px-2 py-0.5 font-mono text-xs text-fg-muted bg-bg-subtle/80 border border-border rounded transition-colors duration-200 opacity-0 group-hover/executecmd:opacity-100 hover:(text-fg border-border-hover) active:scale-95 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fg/50"
-                  @click.stop="copyExecuteCommand"
-                >
-                  {{ executeCopied ? 'copied!' : 'copy' }}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Regular packages: Install command with optional run command -->
-      <section v-else aria-labelledby="install-heading" class="mb-8">
-        <div class="flex flex-wrap items-center justify-between mb-3">
-          <h2 id="install-heading" class="text-xs text-fg-subtle uppercase tracking-wider">
-            {{ $t('package.install.title') }}
+          <h2 id="getstarted-heading" class="text-xs text-fg-subtle uppercase tracking-wider">
+            {{ $t('package.get_started.title') }}
           </h2>
           <!-- Package manager tabs -->
           <div
@@ -896,7 +819,7 @@ defineOgImageComponent('Package', {
                 :class="
                   selectedPM === pm.id
                     ? 'bg-bg shadow text-fg border-border'
-                    : 'text-fg-subtle hover:text-fg  border-transparent'
+                    : 'text-fg-subtle hover:text-fg border-transparent'
                 "
                 @click="selectedPM = pm.id"
               >
@@ -917,7 +840,7 @@ defineOgImageComponent('Package', {
           </div>
         </div>
         <div class="relative group">
-          <!-- Terminal-style install command -->
+          <!-- Terminal-style command block -->
           <div class="bg-bg-subtle border border-border rounded-lg overflow-hidden">
             <div class="flex gap-1.5 px-3 pt-2 sm:px-4 sm:pt-3">
               <span class="w-2.5 h-2.5 rounded-full bg-fg-subtle" />
@@ -925,139 +848,181 @@ defineOgImageComponent('Package', {
               <span class="w-2.5 h-2.5 rounded-full bg-fg-subtle" />
             </div>
             <div class="px-3 pt-2 pb-3 sm:px-4 sm:pt-3 sm:pb-4 space-y-1">
-              <!-- Install command -->
-              <div class="flex items-center gap-2 group/installcmd">
-                <span class="text-fg-subtle font-mono text-sm select-none">$</span>
-                <code class="font-mono text-sm"
-                  ><ClientOnly
-                    ><span
-                      v-for="(part, i) in installCommandParts"
-                      :key="i"
-                      :class="i === 0 ? 'text-fg' : 'text-fg-muted'"
-                      >{{ i > 0 ? ' ' : '' }}{{ part }}</span
-                    ><template #fallback
-                      ><span class="text-fg">npm</span
-                      ><span class="text-fg-muted"> install {{ pkg.name }}</span></template
-                    ></ClientOnly
-                  ></code
-                >
-                <button
-                  type="button"
-                  class="px-2 py-0.5 font-mono text-xs text-fg-muted bg-bg-subtle/80 border border-border rounded transition-colors duration-200 opacity-0 group-hover/installcmd:opacity-100 hover:(text-fg border-border-hover) active:scale-95 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fg/50"
-                  :aria-label="t('package.install.copy_command')"
-                  @click.stop="copyInstallCommand"
-                >
-                  <span aria-live="polite">{{
-                    copied ? t('common.copied') : t('common.copy')
-                  }}</span>
-                </button>
-              </div>
-
-              <!-- @types package install (when enabled) -->
-              <div v-if="showTypesInInstall" class="flex items-center gap-2">
-                <span class="text-fg-subtle font-mono text-sm select-none">$</span>
-                <code class="font-mono text-sm"
-                  ><span
-                    v-for="(part, i) in typesInstallCommandParts"
-                    :key="i"
-                    :class="i === 0 ? 'text-fg' : 'text-fg-muted'"
-                    >{{ i > 0 ? ' ' : '' }}{{ part }}</span
-                  ></code
-                >
-                <NuxtLink
-                  v-if="typesPackageName"
-                  :to="`/${typesPackageName}`"
-                  class="text-fg-subtle hover:text-fg-muted text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fg/50 rounded"
-                  :title="$t('package.install.view_types', { package: typesPackageName })"
-                >
-                  <span class="i-carbon-arrow-right w-3 h-3" aria-hidden="true" />
-                  <span class="sr-only">View {{ typesPackageName }}</span>
-                </NuxtLink>
-              </div>
-
-              <!-- Run command (only if package has executables) -->
-              <template v-if="executableInfo?.hasExecutable">
-                <!-- Comment line -->
-                <div class="flex items-center gap-2 pt-1">
-                  <span class="text-fg-subtle/50 font-mono text-sm select-none"
-                    ># {{ t('package.run.locally') }}</span
-                  >
-                </div>
-
-                <!-- Primary run command -->
-                <div class="flex items-center gap-2 group/runcmd">
+              <!-- Binary-only packages: Execute command only -->
+              <template v-if="isBinaryOnly">
+                <div class="flex items-center gap-2 group/executecmd">
                   <span class="text-fg-subtle font-mono text-sm select-none">$</span>
                   <code class="font-mono text-sm"
                     ><ClientOnly
                       ><span
-                        v-for="(part, i) in runCommandParts"
+                        v-for="(part, i) in executeCommandParts"
                         :key="i"
                         :class="i === 0 ? 'text-fg' : 'text-fg-muted'"
                         >{{ i > 0 ? ' ' : '' }}{{ part }}</span
                       ><template #fallback
-                        ><span class="text-fg">npx</span>{{ ' '
-                        }}<span class="text-fg-muted">{{
-                          executableInfo?.primaryCommand
-                        }}</span></template
+                        ><span class="text-fg">npx</span
+                        ><span class="text-fg-muted"> {{ pkg.name }}</span></template
                       ></ClientOnly
                     ></code
                   >
                   <button
                     type="button"
-                    class="px-2 py-0.5 font-mono text-xs text-fg-muted bg-bg-subtle/80 border border-border rounded transition-colors duration-200 opacity-0 group-hover/runcmd:opacity-100 hover:(text-fg border-border-hover) active:scale-95 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fg/50"
-                    @click.stop="copyRunCommand(executableInfo?.primaryCommand)"
+                    class="px-2 py-0.5 font-mono text-xs text-fg-muted bg-bg-subtle/80 border border-border rounded transition-colors duration-200 opacity-0 group-hover/executecmd:opacity-100 hover:(text-fg border-border-hover) active:scale-95 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fg/50"
+                    :aria-label="t('package.install.copy_command')"
+                    @click.stop="copyExecuteCommand"
                   >
-                    {{ runCopied ? t('common.copied') : t('common.copy') }}
+                    <span aria-live="polite">{{
+                      executeCopied ? t('common.copied') : t('common.copy')
+                    }}</span>
                   </button>
                 </div>
               </template>
 
-              <!-- Create command (for packages with associated create-* package) -->
-              <template v-if="createPackageInfo">
-                <!-- Comment line -->
-                <div class="flex items-center gap-2 pt-1">
-                  <span class="text-fg-subtle/50 font-mono text-sm select-none"
-                    ># {{ t('package.create.title') }}</span
-                  >
-                </div>
-
-                <!-- Create command -->
-                <div class="flex items-center gap-2 group/createcmd">
+              <!-- Regular packages: Install + optional run/create commands -->
+              <template v-else>
+                <!-- Install command -->
+                <div class="flex items-center gap-2 group/installcmd">
                   <span class="text-fg-subtle font-mono text-sm select-none">$</span>
                   <code class="font-mono text-sm"
                     ><ClientOnly
                       ><span
-                        v-for="(part, i) in createCommandParts"
+                        v-for="(part, i) in installCommandParts"
                         :key="i"
                         :class="i === 0 ? 'text-fg' : 'text-fg-muted'"
                         >{{ i > 0 ? ' ' : '' }}{{ part }}</span
                       ><template #fallback
                         ><span class="text-fg">npm</span
-                        ><span class="text-fg-muted">
-                          create {{ createPackageInfo.packageName.replace('create-', '') }}</span
-                        ></template
+                        ><span class="text-fg-muted"> install {{ pkg.name }}</span></template
                       ></ClientOnly
                     ></code
                   >
                   <button
                     type="button"
-                    class="px-2 py-0.5 font-mono text-xs text-fg-muted bg-bg-subtle/80 border border-border rounded transition-colors duration-200 opacity-0 group-hover/createcmd:opacity-100 hover:(text-fg border-border-hover) active:scale-95 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fg/50"
-                    :aria-label="t('package.create.copy_command')"
-                    @click.stop="copyCreateCommand"
+                    class="px-2 py-0.5 font-mono text-xs text-fg-muted bg-bg-subtle/80 border border-border rounded transition-colors duration-200 opacity-0 group-hover/installcmd:opacity-100 hover:(text-fg border-border-hover) active:scale-95 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fg/50"
+                    :aria-label="t('package.install.copy_command')"
+                    @click.stop="copyInstallCommand"
                   >
                     <span aria-live="polite">{{
-                      createCopied ? t('common.copied') : t('common.copy')
+                      copied ? t('common.copied') : t('common.copy')
                     }}</span>
                   </button>
+                </div>
+
+                <!-- @types package install (when enabled) -->
+                <div v-if="showTypesInInstall" class="flex items-center gap-2">
+                  <span class="text-fg-subtle font-mono text-sm select-none">$</span>
+                  <code class="font-mono text-sm"
+                    ><span
+                      v-for="(part, i) in typesInstallCommandParts"
+                      :key="i"
+                      :class="i === 0 ? 'text-fg' : 'text-fg-muted'"
+                      >{{ i > 0 ? ' ' : '' }}{{ part }}</span
+                    ></code
+                  >
                   <NuxtLink
-                    :to="`/${createPackageInfo.packageName}`"
+                    v-if="typesPackageName"
+                    :to="`/${typesPackageName}`"
                     class="text-fg-subtle hover:text-fg-muted text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fg/50 rounded"
-                    :title="`View ${createPackageInfo.packageName}`"
+                    :title="$t('package.install.view_types', { package: typesPackageName })"
                   >
                     <span class="i-carbon-arrow-right w-3 h-3" aria-hidden="true" />
-                    <span class="sr-only">View {{ createPackageInfo.packageName }}</span>
+                    <span class="sr-only">{{
+                      $t('package.install.view_types', { package: typesPackageName })
+                    }}</span>
                   </NuxtLink>
                 </div>
+
+                <!-- Run command (only if package has executables) -->
+                <template v-if="executableInfo?.hasExecutable">
+                  <!-- Comment line -->
+                  <div class="flex items-center gap-2 pt-1">
+                    <span class="text-fg-subtle/50 font-mono text-sm select-none"
+                      ># {{ t('package.run.locally') }}</span
+                    >
+                  </div>
+
+                  <!-- Primary run command -->
+                  <div class="flex items-center gap-2 group/runcmd">
+                    <span class="text-fg-subtle font-mono text-sm select-none">$</span>
+                    <code class="font-mono text-sm"
+                      ><ClientOnly
+                        ><span
+                          v-for="(part, i) in runCommandParts"
+                          :key="i"
+                          :class="i === 0 ? 'text-fg' : 'text-fg-muted'"
+                          >{{ i > 0 ? ' ' : '' }}{{ part }}</span
+                        ><template #fallback
+                          ><span class="text-fg">npx</span>{{ ' '
+                          }}<span class="text-fg-muted">{{
+                            executableInfo?.primaryCommand
+                          }}</span></template
+                        ></ClientOnly
+                      ></code
+                    >
+                    <button
+                      type="button"
+                      class="px-2 py-0.5 font-mono text-xs text-fg-muted bg-bg-subtle/80 border border-border rounded transition-colors duration-200 opacity-0 group-hover/runcmd:opacity-100 hover:(text-fg border-border-hover) active:scale-95 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fg/50"
+                      :aria-label="t('package.install.copy_command')"
+                      @click.stop="copyRunCommand(executableInfo?.primaryCommand)"
+                    >
+                      <span aria-live="polite">{{
+                        runCopied ? t('common.copied') : t('common.copy')
+                      }}</span>
+                    </button>
+                  </div>
+                </template>
+
+                <!-- Create command (for packages with associated create-* package) -->
+                <template v-if="createPackageInfo">
+                  <!-- Comment line -->
+                  <div class="flex items-center gap-2 pt-1">
+                    <span class="text-fg-subtle/50 font-mono text-sm select-none"
+                      ># {{ t('package.create.title') }}</span
+                    >
+                  </div>
+
+                  <!-- Create command -->
+                  <div class="flex items-center gap-2 group/createcmd">
+                    <span class="text-fg-subtle font-mono text-sm select-none">$</span>
+                    <code class="font-mono text-sm"
+                      ><ClientOnly
+                        ><span
+                          v-for="(part, i) in createCommandParts"
+                          :key="i"
+                          :class="i === 0 ? 'text-fg' : 'text-fg-muted'"
+                          >{{ i > 0 ? ' ' : '' }}{{ part }}</span
+                        ><template #fallback
+                          ><span class="text-fg">npm</span
+                          ><span class="text-fg-muted">
+                            create {{ createPackageInfo.packageName.replace('create-', '') }}</span
+                          ></template
+                        ></ClientOnly
+                      ></code
+                    >
+                    <button
+                      type="button"
+                      class="px-2 py-0.5 font-mono text-xs text-fg-muted bg-bg-subtle/80 border border-border rounded transition-colors duration-200 opacity-0 group-hover/createcmd:opacity-100 hover:(text-fg border-border-hover) active:scale-95 focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fg/50"
+                      :aria-label="t('package.create.copy_command')"
+                      @click.stop="copyCreateCommand"
+                    >
+                      <span aria-live="polite">{{
+                        createCopied ? t('common.copied') : t('common.copy')
+                      }}</span>
+                    </button>
+                    <NuxtLink
+                      :to="`/${createPackageInfo.packageName}`"
+                      class="text-fg-subtle hover:text-fg-muted text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fg/50 rounded"
+                      :title="
+                        t('package.create.view_package', { package: createPackageInfo.packageName })
+                      "
+                    >
+                      <span class="i-carbon-arrow-right w-3 h-3" aria-hidden="true" />
+                      <span class="sr-only">{{
+                        t('package.create.view_package', { package: createPackageInfo.packageName })
+                      }}</span>
+                    </NuxtLink>
+                  </div>
+                </template>
               </template>
             </div>
           </div>

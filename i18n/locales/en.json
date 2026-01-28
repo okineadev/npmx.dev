@@ -104,6 +104,9 @@
       "code": "code",
       "docs": "docs"
     },
+    "get_started": {
+      "title": "Get started"
+    },
     "install": {
       "title": "Install",
       "pm_label": "Package manager",
@@ -112,7 +115,8 @@
     },
     "create": {
       "title": "Create new project",
-      "copy_command": "Copy create command"
+      "copy_command": "Copy create command",
+      "view_package": "View {package}"
     },
     "run": {
       "title": "Run",

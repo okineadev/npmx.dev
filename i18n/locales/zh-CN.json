@@ -104,6 +104,9 @@
       "code": "代码",
       "docs": "文档"
     },
+    "get_started": {
+      "title": "开始使用"
+    },
     "install": {
       "title": "安装",
       "pm_label": "包管理器",
@@ -112,7 +115,8 @@
     },
     "create": {
       "title": "创建新项目",
-      "copy_command": "复制创建命令"
+      "copy_command": "复制创建命令",
+      "view_package": "查看 {package}"
     },
     "run": {
       "title": "运行",
