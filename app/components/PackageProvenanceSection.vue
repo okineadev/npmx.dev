@@ -1,4 +1,4 @@
-<script setup lang="ts">
+n<script setup lang="ts">
 import type { ProvenanceDetails } from '#shared/types'
 
 defineProps<{
